@@ -62,17 +62,27 @@ public abstract class BaseAction extends Observable {
 	/**
 	 * json请求成功之后的处理
 	 */
-	public abstract void jsonRequestSuccess(JSONObject response, int requestType);
-
+	public void jsonRequestSuccess(JSONObject response, int requestType) {
+		data.setRequestType(requestType);
+		data.setData(map);
+		data.setSuccess(true);
+	}
 	/**
 	 * string请求成功之后的处理
 	 */
-	public abstract void stringRequestSuccess(String response, int requestType);
-
+	public void stringRequestSuccess(String response, int requestType) {
+		data.setRequestType(requestType);
+		data.setData(map);
+		data.setSuccess(true);
+	}
 	/**
 	 * 请求失敗之后的处理
 	 */
-	public abstract void requestFail(VolleyError error, int requestType);
+	public void requestFail(VolleyError error, int requestType) {
+		data.setRequestType(requestType);
+		data.setData(null);
+		data.setSuccess(false);
+	}
 	
 	/**
 	 * JSON請求成功之後的回調Listener
@@ -149,7 +159,7 @@ public abstract class BaseAction extends Observable {
 		this.map = map;
 	}
 	
-	public void changeData() {
+	public void changedData() {
 		notifyObservers(data);
 	}
 }

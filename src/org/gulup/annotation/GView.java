@@ -1,4 +1,4 @@
-package org.gulup.view.annotation;
+package org.gulup.annotation;
 
 /**
  * @author gulup
@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ViewInject {
+public @interface GView {
 
 	int value() default 0;
 	/* parent view id */
@@ -21,9 +21,9 @@ public @interface ViewInject {
 	
 	String name() default "";
 	
-	String defType() default "id";
+	String type() default "id";
 	
-	public String onClick() default "";
+	public String onClick() default "onClick";
 	public String longClick() default "";
 	public String itemClick() default "";
 	public String itemLongClick() default "";

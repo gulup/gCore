@@ -1,4 +1,4 @@
-package org.gulup.view.annotation;
+package org.gulup.annotation;
 
 /**
  * @author gulup
@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ContentViewInject {
+public @interface GContentView {
 	int value() default 0;
 	String name() default "";
-	String defType() default "";
+	String type() default "layout";
 }

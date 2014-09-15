@@ -1,4 +1,4 @@
-package org.gulup.view.annotation;
+package org.gulup.annotation;
 /**
  * @author gulup
  * @version 创建时间：2014-5-10 下午12:04:02
@@ -10,11 +10,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.gulup.view.*;
-
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ResInject {
+public @interface GRes {
     int id();
 
     ResType type();

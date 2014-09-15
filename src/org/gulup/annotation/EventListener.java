@@ -1,4 +1,4 @@
-package org.gulup.view.annotation;
+package org.gulup.annotation;
 
 import java.lang.reflect.Method;
 

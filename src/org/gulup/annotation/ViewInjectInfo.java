@@ -1,4 +1,4 @@
-package org.gulup.view;
+package org.gulup.annotation;
 
 /**
  * @author gulup

@@ -1,4 +1,4 @@
-package org.gulup.view;
+package org.gulup.annotation;
 /**
  * @author gulup
  * @version 创建时间：2014-5-10 下午12:04:56

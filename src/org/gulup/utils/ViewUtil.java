@@ -1,7 +1,7 @@
 package org.gulup.utils;
 
 /**
- * @author gulup
+ * @author 覃江鵬
  * @version 创建时间：2014-5-10 下午12:59:14 
  * 类说明:注解工具类.类中方法用于配合注解初始化注解中的参数
  */
@@ -10,15 +10,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.gulup.annotation.GAction;
+import org.gulup.annotation.GContentView;
+import org.gulup.annotation.EventListener;
+import org.gulup.annotation.GPreference;
+import org.gulup.annotation.GRes;
+import org.gulup.annotation.ResLoader;
+import org.gulup.annotation.ViewFinder;
+import org.gulup.annotation.GView;
 import org.gulup.core.BaseAction;
-import org.gulup.view.ResLoader;
-import org.gulup.view.ViewFinder;
-import org.gulup.view.annotation.ActionInject;
-import org.gulup.view.annotation.ContentViewInject;
-import org.gulup.view.annotation.EventListener;
-import org.gulup.view.annotation.PreferenceInject;
-import org.gulup.view.annotation.ResInject;
-import org.gulup.view.annotation.ViewInject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,7 +27,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.view.View;
 import android.widget.AbsListView;
-
 
 public class ViewUtil {
 
@@ -73,8 +72,8 @@ public class ViewUtil {
 		Class<?> handlerType = handler.getClass();
 
 		// 根據佈局註解,進行佈局綁定
-		ContentViewInject contentView = handlerType
-				.getAnnotation(ContentViewInject.class);
+		GContentView contentView = handlerType
+				.getAnnotation(GContentView.class);
 		if (contentView != null) {
 			try {
 				Method setContentViewMethod = handlerType.getMethod(
@@ -88,7 +87,7 @@ public class ViewUtil {
 									.getResources()
 									.getIdentifier(
 											contentView.name(),
-											contentView.defType(),
+											contentView.type(),
 											finder.getContext()
 													.getPackageName()));
 				}
@@ -101,7 +100,7 @@ public class ViewUtil {
 		Field[] fields = handlerType.getDeclaredFields();
 		if (fields != null && fields.length > 0) {
 			for (Field field : fields) {
-				ViewInject viewInject = field.getAnnotation(ViewInject.class);
+				GView viewInject = field.getAnnotation(GView.class);
 				if (viewInject != null) {
 					try {
 						View view = null;
@@ -110,7 +109,7 @@ public class ViewUtil {
 									viewInject.parentId());
 						} else {
 							view = finder.findViewById(viewInject.name(),
-									viewInject.defType());
+									viewInject.type());
 						}
 						if (view != null) {
 							field.setAccessible(true);
@@ -129,8 +128,8 @@ public class ViewUtil {
 						LogUtil.e(e.getMessage(), e);
 					}
 				} else {
-					ActionInject actionInject = field
-							.getAnnotation(ActionInject.class);
+					GAction actionInject = field
+							.getAnnotation(GAction.class);
 					if (actionInject != null) {
 						try {
 							Class clazz = field.getType();
@@ -146,8 +145,8 @@ public class ViewUtil {
 							LogUtil.e(e.getMessage(), e);
 						}
 					} else {
-						ResInject resInject = field
-								.getAnnotation(ResInject.class);
+						GRes resInject = field
+								.getAnnotation(GRes.class);
 						if (resInject != null) {
 							try {
 								Object res = ResLoader.loadRes(
@@ -161,8 +160,8 @@ public class ViewUtil {
 								LogUtil.e(e.getMessage(), e);
 							}
 						} else {
-							PreferenceInject preferenceInject = field
-									.getAnnotation(PreferenceInject.class);
+							GPreference preferenceInject = field
+									.getAnnotation(GPreference.class);
 							if (preferenceInject != null) {
 								try {
 									Preference preference = finder
