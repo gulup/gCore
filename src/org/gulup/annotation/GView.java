@@ -23,6 +23,9 @@ public @interface GView {
 	
 	String type() default "id";
 	
+	float width() default 0;
+	float height() default 0;
+	
 	public String onClick() default "onClick";
 	public String longClick() default "";
 	public String itemClick() default "";

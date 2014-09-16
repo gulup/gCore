@@ -24,13 +24,13 @@ import com.android.volley.VolleyError;
 public abstract class BaseAction extends Observable {
 	protected Context context;
 	protected RequestQueue request;
-	protected ActionData data;
+	protected GData data;
 	protected Map<String,Object> map = null;
 
 	public BaseAction(Context context) {
 		this.context = context;
 		map = new HashMap<String,Object>();
-		data = new ActionData();
+		data = new GData();
 	}
 
 	public void getJsonRequest(String url,int requestType,Map hander){

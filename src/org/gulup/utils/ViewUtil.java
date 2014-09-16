@@ -123,6 +123,18 @@ public class ViewUtil {
 							setListener(handler, field,
 									viewInject.itemLongClick(),
 									inMethod.itemLongClick);
+							if(viewInject.width()!=0){
+								if(viewInject.height()!=0){
+									Method setViewSize = handlerType.getMethod("setViewSize", View.class,float.class,float.class);
+									setViewSize.invoke(handler, view,viewInject.width(),viewInject.height());
+								}else{
+									Method setViewWidth = handlerType.getMethod("setViewWidth", View.class,float.class);
+									setViewWidth.invoke(handler, view,viewInject.width());
+								}
+							}else if(viewInject.height()!=0){
+								Method setViewHeight = handlerType.getMethod("setViewHeight", View.class,float.class);
+								setViewHeight.invoke(handler, view,viewInject.height());
+							}
 						}
 					} catch (Throwable e) {
 						LogUtil.e(e.getMessage(), e);

@@ -9,7 +9,7 @@ import java.util.Map;
  * 类说明:view層與action層交互的數據全部封裝在Data中
  */
 
-public class ActionData implements Serializable {
+public class GData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private boolean isSuccess = false;
@@ -17,9 +17,9 @@ public class ActionData implements Serializable {
 	private int requestType;
 	private Map<String,Object> data;
 	
-	public ActionData(){}
+	public GData(){}
 	
-	public ActionData(int requestType,Map<String,Object> data,boolean isSuccess){
+	public GData(int requestType,Map<String,Object> data,boolean isSuccess){
 		this.requestType = requestType;
 		this.data = data;
 		this.isSuccess = isSuccess;
