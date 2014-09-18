@@ -3,7 +3,7 @@ package org.gulup.view;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.gulup.core.BaseAction;
+import org.gulup.core.GBaseAction;
 import org.gulup.core.GData;
 import org.gulup.utils.Constant;
 import org.gulup.utils.ScreenUtil;
@@ -13,6 +13,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 /**
  * @author gulup
@@ -40,7 +42,7 @@ public abstract class GBaseView extends Activity implements Observer {
 	 * @param action 需要與view綁定的action
 	 * @return 返回綁定是否成功
 	 */
-	public boolean setAction(BaseAction action){
+	public boolean setAction(GBaseAction action){
 		if(action!=null){
 			action.addObserver(this);
 		}else{
@@ -126,5 +128,32 @@ public abstract class GBaseView extends Activity implements Observer {
 		LayoutParams params = view.getLayoutParams();
 		params.height = (int) (height * screenHeight);
 		view.setLayoutParams(params);
+	}
+	
+	/**
+	 * 設置控件的邊距
+	 * 
+	 * @param view
+	 * @param top
+	 * @param bootom
+	 * @param left
+	 * @param right
+	 */
+	public void setViewMargin(View view,float top,float bootom,float left,float right){
+		if(view.getLayoutParams() instanceof LinearLayout.LayoutParams){
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(view.getLayoutParams());
+			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
+			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
+			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
+			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+			view.setLayoutParams(params);
+		}else{
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
+			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
+			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
+			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
+			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+			view.setLayoutParams(params);
+		}
 	}
 }

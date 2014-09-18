@@ -26,6 +26,11 @@ public @interface GView {
 	float width() default 0;
 	float height() default 0;
 	
+	float top() default 0;
+	float bottom() default 0;
+	float left() default 0;
+	float right() default 0;
+	
 	public String onClick() default "onClick";
 	public String longClick() default "";
 	public String itemClick() default "";

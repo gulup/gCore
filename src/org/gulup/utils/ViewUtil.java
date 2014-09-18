@@ -18,7 +18,7 @@ import org.gulup.annotation.GRes;
 import org.gulup.annotation.ResLoader;
 import org.gulup.annotation.ViewFinder;
 import org.gulup.annotation.GView;
-import org.gulup.core.BaseAction;
+import org.gulup.core.GBaseAction;
 
 import android.app.Activity;
 import android.content.Context;
@@ -135,6 +135,8 @@ public class ViewUtil {
 								Method setViewHeight = handlerType.getMethod("setViewHeight", View.class,float.class);
 								setViewHeight.invoke(handler, view,viewInject.height());
 							}
+							Method setViewMargin = handlerType.getMethod("setViewMargin", View.class,float.class,float.class,float.class,float.class);
+							setViewMargin.invoke(handler, view,viewInject.top(),viewInject.bottom(),viewInject.left(),viewInject.right());
 						}
 					} catch (Throwable e) {
 						LogUtil.e(e.getMessage(), e);
@@ -145,13 +147,13 @@ public class ViewUtil {
 					if (actionInject != null) {
 						try {
 							Class clazz = field.getType();
-							Constructor<? extends BaseAction> c = clazz
+							Constructor<? extends GBaseAction> c = clazz
 									.getConstructor(Context.class);
-							BaseAction action = c.newInstance(handler);
+							GBaseAction action = c.newInstance(handler);
 							field.setAccessible(true);
 							field.set(handler, action);
 							Method setAction = handlerType.getMethod(
-									"setAction", BaseAction.class);
+									"setAction", GBaseAction.class);
 							setAction.invoke(handler, action);
 						} catch (Throwable e) {
 							LogUtil.e(e.getMessage(), e);

@@ -21,13 +21,13 @@ import com.android.volley.VolleyError;
  * @author gulup
  * @version 创建时间：2014-5-11 下午12:37:51 类说明:Action基礎類
  */
-public abstract class BaseAction extends Observable {
+public abstract class GBaseAction extends Observable {
 	protected Context context;
 	protected RequestQueue request;
 	protected GData data;
 	protected Map<String,Object> map = null;
 
-	public BaseAction(Context context) {
+	public GBaseAction(Context context) {
 		this.context = context;
 		map = new HashMap<String,Object>();
 		data = new GData();
