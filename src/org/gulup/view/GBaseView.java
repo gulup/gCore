@@ -13,6 +13,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -27,14 +29,26 @@ public abstract class GBaseView extends Activity implements Observer {
 	protected int screenHeight;
 	protected int screenWidth;
 	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState,boolean isFull) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		if(isFull){
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		initScreen(this);
+		ViewUtil.inject(this);
+		init();
+	}
+	
+	/**
+	 * 初始化Screen参数
+	 * 
+	 */
+	public void initScreen(Activity activity){
 		su = new ScreenUtil();
-		su.setWidthAndHighByActivity(this);
+		su.setWidthAndHighByActivity(activity);
 		this.screenHeight = su.getScreenHeight();
 		this.screenWidth = su.getScreenWidth();
-		ViewUtil.inject(this);
 	}
 
 	/**
@@ -149,10 +163,19 @@ public abstract class GBaseView extends Activity implements Observer {
 			view.setLayoutParams(params);
 		}else{
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
+			int[] rules = params.getRules();
 			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
 			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
 			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
 			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+			view.setLayoutParams(params);
+		}
+	}
+	
+	public void setCenter(View view,int parameter){
+		if(view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
+			params.addRule(parameter);
 			view.setLayoutParams(params);
 		}
 	}

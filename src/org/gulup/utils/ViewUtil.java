@@ -137,6 +137,10 @@ public class ViewUtil {
 							}
 							Method setViewMargin = handlerType.getMethod("setViewMargin", View.class,float.class,float.class,float.class,float.class);
 							setViewMargin.invoke(handler, view,viewInject.top(),viewInject.bottom(),viewInject.left(),viewInject.right());
+							if(viewInject.center()!=0){
+								Method setCenter = handlerType.getMethod("setCenter", View.class,int.class);
+								setCenter.invoke(handler, view,viewInject.center());
+							}
 						}
 					} catch (Throwable e) {
 						LogUtil.e(e.getMessage(), e);
@@ -149,7 +153,12 @@ public class ViewUtil {
 							Class clazz = field.getType();
 							Constructor<? extends GBaseAction> c = clazz
 									.getConstructor(Context.class);
-							GBaseAction action = c.newInstance(handler);
+							GBaseAction action = null;
+							if(finder.getContext()!=null){
+								action = c.newInstance(finder.getContext());
+							}else{
+								action = c.newInstance(handler);
+							}
 							field.setAccessible(true);
 							field.set(handler, action);
 							Method setAction = handlerType.getMethod(
