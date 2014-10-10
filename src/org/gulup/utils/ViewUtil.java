@@ -8,11 +8,13 @@ package org.gulup.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.gulup.annotation.GAction;
 import org.gulup.annotation.GContentView;
 import org.gulup.annotation.EventListener;
+import org.gulup.annotation.GFragment;
 import org.gulup.annotation.GPreference;
 import org.gulup.annotation.GRes;
 import org.gulup.annotation.ResLoader;
@@ -25,6 +27,7 @@ import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.AbsListView;
 
@@ -36,9 +39,9 @@ public class ViewUtil {
 	public static void inject(View view) {
 		injectObject(view, new ViewFinder(view));
 	}
-	
-	public static void inject(Object handler,View view,Context context) {
-		injectObject(handler, new ViewFinder(view,context));
+
+	public static void inject(Object handler, View view, Context context) {
+		injectObject(handler, new ViewFinder(view, context));
 	}
 
 	public static void inject(Activity activity) {
@@ -68,7 +71,6 @@ public class ViewUtil {
 
 	@SuppressWarnings("ConstantConditions")
 	private static void injectObject(Object handler, ViewFinder finder) {
-
 		Class<?> handlerType = handler.getClass();
 
 		// 根據佈局註解,進行佈局綁定
@@ -123,40 +125,55 @@ public class ViewUtil {
 							setListener(handler, field,
 									viewInject.itemLongClick(),
 									inMethod.itemLongClick);
-							if(viewInject.width()!=0){
-								if(viewInject.height()!=0){
-									Method setViewSize = handlerType.getMethod("setViewSize", View.class,float.class,float.class);
-									setViewSize.invoke(handler, view,viewInject.width(),viewInject.height());
-								}else{
-									Method setViewWidth = handlerType.getMethod("setViewWidth", View.class,float.class);
-									setViewWidth.invoke(handler, view,viewInject.width());
+							if (viewInject.width() != 0) {
+								if (viewInject.height() != 0) {
+									Method setViewSize = handlerType.getMethod(
+											"setViewSize", View.class,
+											float.class, float.class);
+									setViewSize.invoke(handler, view,
+											viewInject.width(),
+											viewInject.height());
+								} else {
+									Method setViewWidth = handlerType
+											.getMethod("setViewWidth",
+													View.class, float.class);
+									setViewWidth.invoke(handler, view,
+											viewInject.width());
 								}
-							}else if(viewInject.height()!=0){
-								Method setViewHeight = handlerType.getMethod("setViewHeight", View.class,float.class);
-								setViewHeight.invoke(handler, view,viewInject.height());
+							} else if (viewInject.height() != 0) {
+								Method setViewHeight = handlerType.getMethod(
+										"setViewHeight", View.class,
+										float.class);
+								setViewHeight.invoke(handler, view,
+										viewInject.height());
 							}
-							Method setViewMargin = handlerType.getMethod("setViewMargin", View.class,float.class,float.class,float.class,float.class);
-							setViewMargin.invoke(handler, view,viewInject.top(),viewInject.bottom(),viewInject.left(),viewInject.right());
-							if(viewInject.center()!=0){
-								Method setCenter = handlerType.getMethod("setCenter", View.class,int.class);
-								setCenter.invoke(handler, view,viewInject.center());
+							Method setViewMargin = handlerType.getMethod(
+									"setViewMargin", View.class, float.class,
+									float.class, float.class, float.class);
+							setViewMargin.invoke(handler, view,
+									viewInject.top(), viewInject.bottom(),
+									viewInject.left(), viewInject.right());
+							if (viewInject.center() != 0) {
+								Method setCenter = handlerType.getMethod(
+										"setCenter", View.class, int.class);
+								setCenter.invoke(handler, view,
+										viewInject.center());
 							}
 						}
 					} catch (Throwable e) {
 						LogUtil.e(e.getMessage(), e);
 					}
 				} else {
-					GAction actionInject = field
-							.getAnnotation(GAction.class);
+					GAction actionInject = field.getAnnotation(GAction.class);
 					if (actionInject != null) {
 						try {
 							Class clazz = field.getType();
 							Constructor<? extends GBaseAction> c = clazz
 									.getConstructor(Context.class);
 							GBaseAction action = null;
-							if(finder.getContext()!=null){
+							if (finder.getContext() != null) {
 								action = c.newInstance(finder.getContext());
-							}else{
+							} else {
 								action = c.newInstance(handler);
 							}
 							field.setAccessible(true);
@@ -168,34 +185,51 @@ public class ViewUtil {
 							LogUtil.e(e.getMessage(), e);
 						}
 					} else {
-						GRes resInject = field
-								.getAnnotation(GRes.class);
-						if (resInject != null) {
+						GFragment fragmentInject = field
+								.getAnnotation(GFragment.class);
+						if (fragmentInject != null) {
 							try {
-								Object res = ResLoader.loadRes(
-										resInject.type(), finder.getContext(),
-										resInject.id());
-								if (res != null) {
-									field.setAccessible(true);
-									field.set(handler, res);
-								}
-							} catch (Throwable e) {
-								LogUtil.e(e.getMessage(), e);
+								Class clazz = field.getType();
+								Fragment fragment = (Fragment) clazz.newInstance();
+								field.setAccessible(true);
+								field.set(handler, fragment);
+							}  catch (IllegalArgumentException e) {
+								e.printStackTrace();
+							} catch (InstantiationException e) {
+								e.printStackTrace();
+							} catch (IllegalAccessException e) {
+								e.printStackTrace();
 							}
 						} else {
-							GPreference preferenceInject = field
-									.getAnnotation(GPreference.class);
-							if (preferenceInject != null) {
+							GRes resInject = field.getAnnotation(GRes.class);
+							if (resInject != null) {
 								try {
-									Preference preference = finder
-											.findPreference(preferenceInject
-													.value());
-									if (preference != null) {
+									Object res = ResLoader
+											.loadRes(resInject.type(),
+													finder.getContext(),
+													resInject.id());
+									if (res != null) {
 										field.setAccessible(true);
-										field.set(handler, preference);
+										field.set(handler, res);
 									}
 								} catch (Throwable e) {
 									LogUtil.e(e.getMessage(), e);
+								}
+							} else {
+								GPreference preferenceInject = field
+										.getAnnotation(GPreference.class);
+								if (preferenceInject != null) {
+									try {
+										Preference preference = finder
+												.findPreference(preferenceInject
+														.value());
+										if (preference != null) {
+											field.setAccessible(true);
+											field.set(handler, preference);
+										}
+									} catch (Throwable e) {
+										LogUtil.e(e.getMessage(), e);
+									}
 								}
 							}
 						}
@@ -204,6 +238,29 @@ public class ViewUtil {
 			}
 		}
 
+	}
+	
+	
+	public static void injectFragment(Object handler,Context context){
+		Class<?> handlerType = handler.getClass();
+		GContentView contentView = handlerType.getAnnotation(GContentView.class);
+		if (contentView != null) {
+			try {
+				Field field = handlerType.getField("id");
+				field.setAccessible(true);
+				if (contentView.value() != 0) {
+					field.set(handler, contentView.value());
+				} else {
+					field.set(handler,context.getResources().getIdentifier(contentView.name(),contentView.type(),context.getPackageName()));
+				}
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private static void setListener(Object injectedSource, Field field,

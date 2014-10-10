@@ -11,37 +11,32 @@ import org.gulup.utils.ViewUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-/**
- * @author gulup
- * @version 创建时间：2014-9-15 下午2:35:23
- * 类说明
- */
-public abstract class GBaseView extends FragmentActivity implements Observer {
+public abstract class GBaseFragment extends Fragment implements Observer{
+	public int id;
+	public View view;
 	
 	private ScreenUtil su;
 	protected int screenHeight;
 	protected int screenWidth;
 	
-	protected void onCreate(Bundle savedInstanceState,boolean isFull) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		if(isFull){
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		initScreen(this);
-		ViewUtil.inject(this);
+	@Override
+	public View onCreateView(LayoutInflater inflater,
+			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		ViewUtil.injectFragment(this, getActivity());
+		view = inflater.inflate(id, container,false);
+		initScreen(getActivity());
+		ViewUtil.inject(this, view ,getActivity());
 		init();
+		return view;
 	}
 	
 	/**
@@ -187,16 +182,5 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 			params.addRule(parameter);
 			view.setLayoutParams(params);
 		}
-	}
-	/**
-	 * 添加,替换指定Fragment到指定布局
-	 * @param id 需要替换的布局id
-	 * @param fragment 需要替换的Fragment
-	 */
-	public void addFragment(int id,Fragment fragment){
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		fragmentTransaction.replace(id, fragment);
-		fragmentTransaction.commit();
 	}
 }
