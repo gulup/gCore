@@ -10,6 +10,8 @@ import org.gulup.utils.GlobalUtil;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -26,6 +28,22 @@ public abstract class GBaseAction extends Observable {
 	protected RequestQueue request;
 	protected GData data;
 	protected Map<String,Object> map = null;
+	
+	public Handler mHandler = new Handler(Looper.getMainLooper());
+	
+	public class GActionRunnable implements Runnable {
+		private boolean isSuccess;
+		
+		public GActionRunnable(boolean isSuccess){
+			this.isSuccess = isSuccess;
+		}
+		
+		@Override
+		public void run() {
+			requestAfter(0, isSuccess);
+			changedData();
+		}
+	}
 
 	public GBaseAction(Context context) {
 		this.context = context;
@@ -58,30 +76,31 @@ public abstract class GBaseAction extends Observable {
 	 * 发起数据请求之前的处理
 	 */
 	public abstract void requestBefore();
+	
+	public void requestAfter(int requestType,boolean isSuccess){
+		setChanged();
+		data.setRequestType(requestType);
+		data.setData(map);
+		data.setSuccess(isSuccess);
+	}
 
 	/**
 	 * json请求成功之后的处理
 	 */
 	public void jsonRequestSuccess(JSONObject response, int requestType) {
-		data.setRequestType(requestType);
-		data.setData(map);
-		data.setSuccess(true);
+		requestAfter(requestType,true);
 	}
 	/**
 	 * string请求成功之后的处理
 	 */
 	public void stringRequestSuccess(String response, int requestType) {
-		data.setRequestType(requestType);
-		data.setData(map);
-		data.setSuccess(true);
+		requestAfter(requestType,true);
 	}
 	/**
 	 * 请求失敗之后的处理
 	 */
 	public void requestFail(VolleyError error, int requestType) {
-		data.setRequestType(requestType);
-		data.setData(null);
-		data.setSuccess(false);
+		requestAfter(requestType,false);
 	}
 	
 	/**
@@ -99,7 +118,6 @@ public abstract class GBaseAction extends Observable {
 
 		@Override
 		public void onResponse(JSONObject response) {
-			setChanged();
 			jsonRequestSuccess(response, requestType);
 		}
 
@@ -120,7 +138,6 @@ public abstract class GBaseAction extends Observable {
 
 		@Override
 		public void onResponse(String response) {
-			setChanged();
 			stringRequestSuccess(response, requestType);
 		}
 
@@ -141,7 +158,6 @@ public abstract class GBaseAction extends Observable {
 
 		@Override
 		public void onErrorResponse(VolleyError error) {
-			setChanged();
 			requestFail(error, requestType);
 		}
 	}
@@ -161,5 +177,9 @@ public abstract class GBaseAction extends Observable {
 	
 	public void changedData() {
 		notifyObservers(data);
+	}
+	
+	public void changedNativeData(boolean isSuccess){
+		mHandler.post(new GActionRunnable(isSuccess));
 	}
 }

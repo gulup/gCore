@@ -1,5 +1,6 @@
 package org.gulup.view;
 
+import java.lang.reflect.Field;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -11,6 +12,7 @@ import org.gulup.utils.ViewUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -159,11 +161,24 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 	 */
 	public void setViewMargin(View view,float top,float bootom,float left,float right){
 		if(view.getLayoutParams() instanceof LinearLayout.LayoutParams){
+			Field fWeight = null;
+			float f = 0;
+			try {
+				fWeight = view.getLayoutParams().getClass().getField("weight");
+				f = (Float) fWeight.get(view.getLayoutParams());
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(view.getLayoutParams());
 			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
 			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
 			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
 			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+			params.weight = f;
 			view.setLayoutParams(params);
 		}else{
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
