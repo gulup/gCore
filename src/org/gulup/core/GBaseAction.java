@@ -41,7 +41,6 @@ public abstract class GBaseAction extends Observable {
 		@Override
 		public void run() {
 			requestAfter(0, isSuccess);
-			changedData();
 		}
 	}
 
@@ -52,23 +51,23 @@ public abstract class GBaseAction extends Observable {
 	}
 
 	public void getJsonRequest(String url,int requestType,Map hander){
-		JsonObjectRequestHttp.runJsonObjectRequest(GlobalUtil.getRequestQueue(context), url, new GJsonResponseListener(requestType), new GErrorResponseListener(requestType), hander);
 		requestBefore();
+		JsonObjectRequestHttp.runJsonObjectRequest(GlobalUtil.getRequestQueue(context), url, new GJsonResponseListener(requestType), new GErrorResponseListener(requestType), hander);
 	};
 	
 	public void getJsonRequest(String url,int requestType,Map hander,Map body){
-		JsonObjectRequestHttp.runJsonObjectRequset(GlobalUtil.getRequestQueue(context), url, Request.Method.POST, new GJsonResponseListener(requestType), new GErrorResponseListener(requestType), hander, body);
 		requestBefore();
+		JsonObjectRequestHttp.runJsonObjectRequset(GlobalUtil.getRequestQueue(context), url, Request.Method.POST, new GJsonResponseListener(requestType), new GErrorResponseListener(requestType), hander, body);
 	};
 	
 	public void getStringRequest(String url,int requestType,Map hander){
-		StringRequestHttp.runStringRequest(GlobalUtil.getRequestQueue(context), url, new GStringResponseListener(requestType), new GErrorResponseListener(requestType), hander);
 		requestBefore();
+		StringRequestHttp.runStringRequest(GlobalUtil.getRequestQueue(context), url, new GStringResponseListener(requestType), new GErrorResponseListener(requestType), hander);
 	};
 	
 	public void getStringRequest(String url,int requestType,Map hander,Map body){
-		StringRequestHttp.runStringRequset(GlobalUtil.getRequestQueue(context), url, Request.Method.POST, new GStringResponseListener(requestType), new GErrorResponseListener(requestType), hander, body);
 		requestBefore();
+		StringRequestHttp.runStringRequset(GlobalUtil.getRequestQueue(context), url, Request.Method.POST, new GStringResponseListener(requestType), new GErrorResponseListener(requestType), hander, body);
 	};
 
 
@@ -77,23 +76,36 @@ public abstract class GBaseAction extends Observable {
 	 */
 	public abstract void requestBefore();
 	
+	/**
+	 * 请求处理完成后,进行response数据处理.
+	 */
+	public abstract void jsonRequestHandle(JSONObject response, int requestType);
+	
+	/**
+	 * 请求处理完成后,进行response数据处理.
+	 */
+	public abstract void stringRequestHandle(String response, int requestType);
+	
 	public void requestAfter(int requestType,boolean isSuccess){
 		setChanged();
 		data.setRequestType(requestType);
 		data.setData(map);
 		data.setSuccess(isSuccess);
+		changedData();
 	}
 
 	/**
 	 * json请求成功之后的处理
 	 */
 	public void jsonRequestSuccess(JSONObject response, int requestType) {
+		jsonRequestHandle(response,requestType);
 		requestAfter(requestType,true);
 	}
 	/**
 	 * string请求成功之后的处理
 	 */
 	public void stringRequestSuccess(String response, int requestType) {
+		stringRequestHandle(response, requestType);
 		requestAfter(requestType,true);
 	}
 	/**
