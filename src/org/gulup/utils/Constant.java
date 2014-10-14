@@ -5,6 +5,6 @@ package org.gulup.utils;
  * 类说明
  */
 public class Constant {
-	public static final float DEF_WIDTH = 720.0f;
-	public static final float DEF_HEIGHT = 1280.0f;
+	public static float DEF_WIDTH = 720.0f;
+	public static float DEF_HEIGHT = 1280.0f;
 }

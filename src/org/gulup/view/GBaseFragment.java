@@ -24,16 +24,16 @@ public abstract class GBaseFragment extends Fragment implements Observer{
 	public int id;
 	public View view;
 	
-	private ScreenUtil su;
+	/*public ScreenUtil su;
 	protected int screenHeight;
-	protected int screenWidth;
+	protected int screenWidth;*/
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		ViewUtil.injectFragment(this, getActivity());
 		view = inflater.inflate(id, container,false);
-		initScreen(getActivity());
+		//initScreen(getActivity());
 		ViewUtil.inject(this, view ,getActivity());
 		init();
 		return view;
@@ -43,12 +43,12 @@ public abstract class GBaseFragment extends Fragment implements Observer{
 	 * 初始化Screen参数
 	 * 
 	 */
-	public void initScreen(Activity activity){
+	/*public void initScreen(Activity activity){
 		su = new ScreenUtil();
 		su.setWidthAndHighByActivity(activity);
 		this.screenHeight = su.getScreenHeight();
 		this.screenWidth = su.getScreenWidth();
-	}
+	}*/
 
 	/**
 	 * 將action與view綁定起來的方法,交由註解綁定,不需要顯式調用
@@ -102,85 +102,5 @@ public abstract class GBaseFragment extends Fragment implements Observer{
 		}
 	}
 
-	/**
-	 *  设置控件寬高
-	 * @param view
-	 * @param widthScale
-	 * @param highScale
-	 */
-	public void setViewSize(View view, float widthScale, float highScale) {
-		float width = widthScale/Constant.DEF_WIDTH;
-		float height = widthScale/Constant.DEF_HEIGHT;
-		LayoutParams params = view.getLayoutParams();
-		params.height = (int) (height * screenHeight);
-		params.width = (int) (width * screenWidth);
-		view.setLayoutParams(params);
-	}
 	
-	/**
-	 * 设置控件的宽（不設置高）
-	 * 
-	 * @param view
-	 * @param widthScale
-	 */
-	public void setViewWidth(View view, float widthScale) {
-		float width = widthScale/Constant.DEF_WIDTH;
-		LayoutParams params = view.getLayoutParams();
-		params.width = (int) (width * screenWidth);
-		view.setLayoutParams(params);
-	}
-	
-	/**
-	 * 设置控件的高度（不設寬）
-	 * 
-	 * @param view
-	 * @param highScale
-	 */
-	public void setViewHeight(View view, float highScale) {
-		float height = highScale/Constant.DEF_HEIGHT;
-		LayoutParams params = view.getLayoutParams();
-		params.height = (int) (height * screenHeight);
-		view.setLayoutParams(params);
-	}
-	
-	/**
-	 * 設置控件的邊距
-	 * 
-	 * @param view
-	 * @param top
-	 * @param bootom
-	 * @param left
-	 * @param right
-	 */
-	public void setViewMargin(View view,float top,float bootom,float left,float right){
-		if(view.getLayoutParams() instanceof LinearLayout.LayoutParams){
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(view.getLayoutParams());
-			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
-			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
-			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
-			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
-			view.setLayoutParams(params);
-		}else{
-			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
-			int[] rules = params.getRules();
-			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
-			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
-			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
-			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
-			view.setLayoutParams(params);
-		}
-	}
-	
-	/**
-	 * 设置控件居中方法
-	 * @param view
-	 * @param parameter
-	 */
-	public void setCenter(View view,int parameter){
-		if(view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
-			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
-			params.addRule(parameter);
-			view.setLayoutParams(params);
-		}
-	}
 }

@@ -1,5 +1,7 @@
 package org.gulup.utils;
 
+import java.lang.reflect.Field;
+
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -11,8 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 public class ScreenUtil {
-	private int screenWidth;
-	private int screenHeight;
+	private static int screenWidth;
+	private static int screenHeight;
 
 	public final int MARGIN_TOP = 1;
 	public final int MARGIN_BOTTON = 2;
@@ -23,18 +25,20 @@ public class ScreenUtil {
 	 *  根據Activity設置屏幕大小
 	 * @param activity
 	 */
-	public void setWidthAndHighByActivity(Activity activity) {
+	public static void initScreen(Activity activity,float baseWidth,float baseHeight) {
 		DisplayMetrics dm = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		screenWidth = dm.widthPixels;
 		screenHeight = dm.heightPixels;
+		Constant.DEF_WIDTH = baseWidth;
+		Constant.DEF_HEIGHT = baseHeight;
 	}
 	
 	/**
 	 * 根據Fragment設置屏幕大小
 	 * @param fragment
 	 */
-	public void setWidthAndHightByFragment(Fragment fragment){
+	public static void setWidthAndHightByFragment(Fragment fragment){
 		DisplayMetrics dm = new DisplayMetrics();
 		fragment.getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
 		screenWidth = dm.widthPixels;
@@ -42,205 +46,98 @@ public class ScreenUtil {
 	}
 	
 	/**
-	 *  设置控件大小
+	 *  设置控件寬高
 	 * @param view
 	 * @param widthScale
 	 * @param highScale
 	 */
-	public void setViewLayoutParams(View view, float widthScale, float highScale) {
+	public static void setViewSize(View view, float widthScale, float highScale) {
+		float width = widthScale/Constant.DEF_WIDTH;
+		float height = highScale/Constant.DEF_HEIGHT;
 		LayoutParams params = view.getLayoutParams();
-		params.height = (int) (highScale * screenHeight);
-		params.width = (int) (widthScale * screenWidth);
+		params.height = (int) (height * screenHeight);
+		params.width = (int) (width * screenWidth);
 		view.setLayoutParams(params);
 	}
+	
 	/**
 	 * 设置控件的宽（不設置高）
 	 * 
 	 * @param view
 	 * @param widthScale
 	 */
-	public void setViewLayoutWidth(View view, float widthScale) {
+	public static void setViewWidth(View view, float widthScale) {
+		float width = widthScale/Constant.DEF_WIDTH;
 		LayoutParams params = view.getLayoutParams();
-		params.width = (int) (widthScale * screenWidth);
+		params.width = (int) (width * screenWidth);
 		view.setLayoutParams(params);
 	}
-
+	
 	/**
 	 * 设置控件的高度（不設寬）
 	 * 
 	 * @param view
 	 * @param highScale
 	 */
-	public void setViewLayoutHeight(View view, float highScale) {
+	public static void setViewHeight(View view, float highScale) {
+		float height = highScale/Constant.DEF_HEIGHT;
 		LayoutParams params = view.getLayoutParams();
-		params.height = (int) (highScale * screenHeight);
+		params.height = (int) (height * screenHeight);
 		view.setLayoutParams(params);
 	}
 	
 	/**
-	 * 通过宽来设置控件大小
+	 * 設置控件的邊距
 	 * 
 	 * @param view
-	 * @param widthScale
-	 * @param highScale
+	 * @param top
+	 * @param bootom
+	 * @param left
+	 * @param right
 	 */
-	public void setViewLayoutByWidth(View view, float widthScale,
-			float highScale) {
-		LayoutParams params = view.getLayoutParams();
-		params.height = (int) (highScale * screenWidth);
-		params.width = (int) (widthScale * screenWidth);
-		view.setLayoutParams(params);
-	}
-
-	/**
-	 * 设置控件宽高
-	 * 
-	 * @param view
-	 * @param width
-	 * @param high
-	 */
-	public void setViewLayoutParams(View view, int width, int height) {
-		LayoutParams params = view.getLayoutParams();
-		params.height = height;
-		params.width = width;
-		view.setLayoutParams(params);
-	}
-	
-	/**
-	 * 設置view之間的間距,前提view必須是在LinearLayout佈局或RelativeLayout布局中
-	 * 
-	 * @param view
-	 * @param scale 比例（上下距離是高*比例，左右距離是寬*比例）
-	 * @param direction 方向
-	 */
-	public void setViewLayoutMagin(View view, float scale, int direction) {
-
+	public static void setViewMargin(View view,float top,float bootom,float left,float right){
 		if(view.getLayoutParams() instanceof LinearLayout.LayoutParams){
-//			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(view.getLayoutParams());
-			LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) view.getLayoutParams();
-			switch (direction) {
-			case MARGIN_TOP:
-				params.topMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_BOTTON:
-				params.bottomMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_LEFT:
-				params.leftMargin = (int) (scale * screenWidth);
-				break;
-			case MARGIN_RIGHT:
-				params.rightMargin = (int) (scale * screenWidth);
-				break;
-			default:
-				break;
+			Field fWeight = null;
+			float f = 0;
+			try {
+				fWeight = view.getLayoutParams().getClass().getField("weight");
+				f = (Float) fWeight.get(view.getLayoutParams());
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
 			}
-			view.setLayoutParams(params);
-		}else if(view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
-//			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
-			RelativeLayout.LayoutParams params = (android.widget.RelativeLayout.LayoutParams) view.getLayoutParams();
-			switch (direction) {
-			case MARGIN_TOP:
-				params.topMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_BOTTON:
-				params.bottomMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_LEFT:
-				params.leftMargin = (int) (scale * screenWidth);
-				break;
-			case MARGIN_RIGHT:
-				params.rightMargin = (int) (scale * screenWidth);
-				break;
-			default:
-				break;
-			}
-		
-			view.setLayoutParams(params);
-		}
-	}
-	
-	public void setViewLayoutMagin(View view, float left, float top,float right, float bottom) {
-
-		if(view.getLayoutParams() instanceof LinearLayout.LayoutParams){
-			LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) view.getLayoutParams();
-			if(left > 0)
-				params.leftMargin = (int) (left *screenWidth);
-			if(top > 0)
-				params.topMargin = (int) (top * screenHeight);
-			if(right > 0)
-				params.rightMargin = (int) (right * screenWidth);
-			if(bottom > 0)
-				params.bottomMargin = (int) (bottom * screenHeight);
-			view.setLayoutParams(params);
-		}else if(view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
-			RelativeLayout.LayoutParams params = (android.widget.RelativeLayout.LayoutParams) view.getLayoutParams();
-			if(left > 0)
-				params.leftMargin = (int) (left *screenWidth);
-			if(top > 0)
-				params.topMargin = (int) (top * screenHeight);
-			if(right > 0)
-				params.rightMargin = (int) (right * screenWidth);
-			if(bottom > 0)
-				params.bottomMargin = (int) (bottom * screenHeight);
-			view.setLayoutParams(params);
-		}
-	}
-	
-	public void setViewLayoutVerticalMagin(View view, float scale, int direction) {
-
-		if(view.getLayoutParams() instanceof LinearLayout.LayoutParams){
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(view.getLayoutParams());
-			switch (direction) {
-			case MARGIN_TOP:
-				params.topMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_BOTTON:
-				params.bottomMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_LEFT:
-				params.leftMargin = (int) (scale * screenWidth);
-				break;
-			case MARGIN_RIGHT:
-				params.rightMargin = (int) (scale * screenWidth);
-				break;
-			default:
-				break;
-			}
+			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
+			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
+			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
+			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+			params.weight = f;
 			view.setLayoutParams(params);
-		}else if(view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
+		}else{
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
-			switch (direction) {
-			case MARGIN_TOP:
-				params.topMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_BOTTON:
-				params.bottomMargin = (int) (scale * screenHeight);
-				break;
-			case MARGIN_LEFT:
-				params.leftMargin = (int) (scale * screenWidth);
-				break;
-			case MARGIN_RIGHT:
-				params.rightMargin = (int) (scale * screenWidth);
-				break;
-			default:
-				break;
-			}
+			int[] rules = params.getRules();
+			params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
+			params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
+			params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
+			params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
 			view.setLayoutParams(params);
 		}
 	}
-
+	
 	/**
-	 * 设置控件宽高
-	 * 
+	 * 设置控件居中方法
 	 * @param view
-	 * @param widthScale
-	 * @param highScale
+	 * @param parameter
 	 */
-	public void setViewLayoutByHeight(View view, int height) {
-		LayoutParams params = view.getLayoutParams();
-		params.height = height;
-		params.width = height;
-		view.setLayoutParams(params);
+	public static void setCenter(View view,int parameter){
+		if(view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(view.getLayoutParams());
+			params.addRule(parameter);
+			view.setLayoutParams(params);
+		}
 	}
 	
 	public int getScreenWidth() {

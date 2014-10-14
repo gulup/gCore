@@ -100,6 +100,25 @@ public class ViewUtil {
 
 		// 根據控件註解,進行控件初始化,資源初始化,監聽事件綁定
 		Field[] fields = handlerType.getDeclaredFields();
+		//Object screenUtil = null;
+		Class<?> suClass = null;
+		try {
+			suClass = Class.forName("org.gulup.utils.ScreenUtil");
+		} catch (ClassNotFoundException e2) {
+			e2.printStackTrace();
+		}
+		/*try {
+			Field su = handlerType.getField("su");
+			screenUtil = su.get(handler);
+			suClass = screenUtil.getClass();
+			//System.out.println();
+		} catch (NoSuchFieldException e1) {
+			e1.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}*/
 		if (fields != null && fields.length > 0) {
 			for (Field field : fields) {
 				GView viewInject = field.getAnnotation(GView.class);
@@ -127,36 +146,36 @@ public class ViewUtil {
 									inMethod.itemLongClick);
 							if (viewInject.width() != 0) {
 								if (viewInject.height() != 0) {
-									Method setViewSize = handlerType.getMethod(
+									Method setViewSize = suClass.getMethod(
 											"setViewSize", View.class,
 											float.class, float.class);
-									setViewSize.invoke(handler, view,
+									setViewSize.invoke(suClass, view,
 											viewInject.width(),
 											viewInject.height());
 								} else {
-									Method setViewWidth = handlerType
+									Method setViewWidth = suClass
 											.getMethod("setViewWidth",
 													View.class, float.class);
-									setViewWidth.invoke(handler, view,
+									setViewWidth.invoke(suClass, view,
 											viewInject.width());
 								}
 							} else if (viewInject.height() != 0) {
-								Method setViewHeight = handlerType.getMethod(
+								Method setViewHeight = suClass.getMethod(
 										"setViewHeight", View.class,
 										float.class);
-								setViewHeight.invoke(handler, view,
+								setViewHeight.invoke(suClass, view,
 										viewInject.height());
 							}
-							Method setViewMargin = handlerType.getMethod(
+							Method setViewMargin = suClass.getMethod(
 									"setViewMargin", View.class, float.class,
 									float.class, float.class, float.class);
-							setViewMargin.invoke(handler, view,
+							setViewMargin.invoke(suClass, view,
 									viewInject.top(), viewInject.bottom(),
 									viewInject.left(), viewInject.right());
 							if (viewInject.center() != 0) {
-								Method setCenter = handlerType.getMethod(
+								Method setCenter = suClass.getMethod(
 										"setCenter", View.class, int.class);
-								setCenter.invoke(handler, view,
+								setCenter.invoke(suClass, view,
 										viewInject.center());
 							}
 						}

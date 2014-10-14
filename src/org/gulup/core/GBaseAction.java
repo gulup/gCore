@@ -33,14 +33,16 @@ public abstract class GBaseAction extends Observable {
 	
 	public class GActionRunnable implements Runnable {
 		private boolean isSuccess;
+		private int requestType;
 		
-		public GActionRunnable(boolean isSuccess){
+		public GActionRunnable(int requestType,boolean isSuccess){
 			this.isSuccess = isSuccess;
+			this.requestType = requestType;
 		}
 		
 		@Override
 		public void run() {
-			requestAfter(0, isSuccess);
+			requestAfter(requestType, isSuccess);
 		}
 	}
 
@@ -191,7 +193,7 @@ public abstract class GBaseAction extends Observable {
 		notifyObservers(data);
 	}
 	
-	public void changedNativeData(boolean isSuccess){
-		mHandler.post(new GActionRunnable(isSuccess));
+	public void changedNativeData(int requestType,boolean isSuccess){
+		mHandler.post(new GActionRunnable(requestType,isSuccess));
 	}
 }
