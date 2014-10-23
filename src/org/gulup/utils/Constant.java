@@ -7,4 +7,6 @@ package org.gulup.utils;
 public class Constant {
 	public static float DEF_WIDTH = 720.0f;
 	public static float DEF_HEIGHT = 1280.0f;
+	public static int ACTIVITY = 0;
+	public static int FRAGMENT = 1;
 }

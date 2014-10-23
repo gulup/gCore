@@ -10,10 +10,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.gulup.utils.Constant;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GContentView {
 	int value() default 0;
+	int viewType() default 0;
 	String name() default "";
 	String type() default "layout";
 }

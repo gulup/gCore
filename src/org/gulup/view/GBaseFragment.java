@@ -3,6 +3,7 @@ package org.gulup.view;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.gulup.annotation.ViewFinder;
 import org.gulup.core.GBaseAction;
 import org.gulup.core.GData;
 import org.gulup.utils.Constant;
@@ -34,7 +35,8 @@ public abstract class GBaseFragment extends Fragment implements Observer{
 		ViewUtil.injectFragment(this, getActivity());
 		view = inflater.inflate(id, container,false);
 		//initScreen(getActivity());
-		ViewUtil.inject(this, view ,getActivity());
+		//ViewUtil.inject(this, view ,getActivity());
+		ViewUtil.injectViewFiled(this, new ViewFinder(view, getActivity()));
 		init();
 		return view;
 	}
