@@ -7,6 +7,7 @@ import java.util.Observer;
 import org.gulup.core.GBaseAction;
 import org.gulup.core.GData;
 import org.gulup.utils.Constant;
+import org.gulup.utils.GlobalUtil;
 import org.gulup.utils.ScreenUtil;
 import org.gulup.utils.ViewUtil;
 
@@ -35,6 +36,15 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
      * public ScreenUtil su; protected int screenHeight; protected int
      * screenWidth;
      */
+    
+    protected void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	requestWindowFeature(Window.FEATURE_NO_TITLE);
+	// initScreen(this);
+	ViewUtil.inject(this);
+	GlobalUtil.setCurrentView(this);
+	init();
+    }
 
     protected void onCreate(Bundle savedInstanceState, boolean isFull) {
 	super.onCreate(savedInstanceState);
@@ -45,20 +55,8 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 	}
 	// initScreen(this);
 	ViewUtil.inject(this);
+	GlobalUtil.setCurrentView(this);
 	init();
-    }
-
-    /**
-     * 初始化Screen参数
-     * 
-     */
-    public void initScreen(Activity activity) {
-	/*
-	 * su = new ScreenUtil(); su.setWidthAndHighByActivity(activity);
-	 * this.screenHeight = su.getScreenHeight(); this.screenWidth =
-	 * su.getScreenWidth();
-	 */
-	// ScreenUtil.setWidthAndHighByActivity(this);
     }
 
     /**

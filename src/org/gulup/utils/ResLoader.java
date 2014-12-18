@@ -1,10 +1,12 @@
-package org.gulup.annotation;
+package org.gulup.utils;
 
 /**
  * @author gulup
  * @version 创建时间：2014-5-10 下午1:17:35
  * 类说明:資源加載類
  */
+
+import org.gulup.annotation.ResType;
 
 import android.content.Context;
 import android.content.res.ColorStateList;

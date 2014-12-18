@@ -17,7 +17,6 @@ import org.gulup.annotation.EventListener;
 import org.gulup.annotation.GFragment;
 import org.gulup.annotation.GPreference;
 import org.gulup.annotation.GRes;
-import org.gulup.annotation.ResLoader;
 import org.gulup.annotation.ViewFinder;
 import org.gulup.annotation.GView;
 import org.gulup.core.GBaseAction;
