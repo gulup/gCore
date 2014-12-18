@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -217,10 +218,25 @@ public abstract class GBaseAction extends Observable {
 	context.startActivity(intent);
     }
     
+    public void changeView(Context context, Class targetView, Bundle bundle) {
+	Intent intent = new Intent();
+	intent.setClass(context, targetView);
+	intent.putExtras(bundle);
+	context.startActivity(intent);
+    }
+    
     public void changeView(Context context, Class targetView, boolean isFinish) {
 	changeView(context, targetView);
 	if (isFinish && GlobalUtil.getCurrentView() != null) {
 	    GlobalUtil.getCurrentView().finish();
 	}
     }
+    
+    public void changeView(Context context, Class targetView, Bundle bundle,boolean isFinish) {
+	changeView(context, targetView,bundle);
+	if (isFinish && GlobalUtil.getCurrentView() != null) {
+	    GlobalUtil.getCurrentView().finish();
+	}
+    }
+    
 }
