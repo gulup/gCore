@@ -13,6 +13,7 @@ import org.gulup.utils.ViewUtil;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -36,7 +37,7 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
      * public ScreenUtil su; protected int screenHeight; protected int
      * screenWidth;
      */
-    
+
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -44,6 +45,12 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 	ViewUtil.inject(this);
 	GlobalUtil.setCurrentView(this);
 	init();
+	if (ScreenUtil.getScreenHeight() > ScreenUtil.getScreenWidth()) {
+	    setVertical();
+	} else {
+	    setLandScape();
+	}
+
     }
 
     protected void onCreate(Bundle savedInstanceState, boolean isFull) {
@@ -57,6 +64,35 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 	ViewUtil.inject(this);
 	GlobalUtil.setCurrentView(this);
 	init();
+	if (ScreenUtil.getScreenHeight() > ScreenUtil.getScreenWidth()) {
+	    setVertical();
+	} else {
+	    setLandScape();
+	}
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+	super.onConfigurationChanged(newConfig);
+	ScreenUtil.setWidthAndHighByActivity(this);
+	if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+	    setLandScape();
+	} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+	    setVertical();
+	}
+    }
+
+    /**
+     * 橫屏佈局設置
+     */
+    public void setLandScape() {
+    }
+
+    /**
+     * 豎屏佈局設置
+     */
+    public void setVertical() {
     }
 
     /**

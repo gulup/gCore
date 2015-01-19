@@ -45,6 +45,18 @@ public class ScreenUtil {
 		screenHeight = dm.heightPixels;
 	}
 	
+	
+	/**
+	 *  根據Activity設置屏幕大小
+	 * @param activity
+	 */
+	public static void setWidthAndHighByActivity(Activity activity) {
+		DisplayMetrics dm = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		screenWidth = dm.widthPixels;
+		screenHeight = dm.heightPixels;
+	}
+	
 	/**
 	 *  设置控件寬高
 	 * @param view
@@ -140,21 +152,21 @@ public class ScreenUtil {
 		}
 	}
 	
-	public int getScreenWidth() {
+	public static int getScreenWidth() {
 		return screenWidth;
 	}
 
-	public int getScreenHeight() {
+	public static int getScreenHeight() {
 		return screenHeight;
 	}
 	
-	public int getScreenWidth(Context context) {
+	public static int getScreenWidth(Context context) {
         WindowManager wm = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         int width = wm.getDefaultDisplay().getWidth();
         return width;
 	}
 
-	public int getScreenHeight(Context context) {
+	public static int getScreenHeight(Context context) {
         WindowManager wm = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         int height = wm.getDefaultDisplay().getHeight();
         return height;
