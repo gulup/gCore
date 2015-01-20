@@ -20,6 +20,8 @@ public class GlobalUtil {
     private static List<GBaseView> viewList;
     
     private static RequestQueue request;
+    
+    private static String direction;
 
     public static RequestQueue getRequestQueue(Context context) {
 	if (request == null) {
@@ -46,4 +48,22 @@ public class GlobalUtil {
     public static void setViewList(List<GBaseView> viewList) {
         GlobalUtil.viewList = viewList;
     }
+
+    public static RequestQueue getRequest() {
+        return request;
+    }
+
+    public static void setRequest(RequestQueue request) {
+        GlobalUtil.request = request;
+    }
+
+    public static String getDirection() {
+        return direction;
+    }
+
+    public static void setDirection(String direction) {
+        GlobalUtil.direction = direction;
+    }
+    
+    
 }

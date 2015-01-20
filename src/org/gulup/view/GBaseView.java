@@ -1,6 +1,5 @@
 package org.gulup.view;
 
-import java.lang.reflect.Field;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -11,21 +10,20 @@ import org.gulup.utils.GlobalUtil;
 import org.gulup.utils.ScreenUtil;
 import org.gulup.utils.ViewUtil;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 /**
  * @author gulup
@@ -38,29 +36,22 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
      * screenWidth;
      */
 
+    private Toast toast;
+
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	requestWindowFeature(Window.FEATURE_NO_TITLE);
-	// initScreen(this);
-	ViewUtil.inject(this);
-	GlobalUtil.setCurrentView(this);
-	init();
-	if (ScreenUtil.getScreenHeight() > ScreenUtil.getScreenWidth()) {
-	    setVertical();
-	} else {
-	    setLandScape();
-	}
-
+	this.onCreate(savedInstanceState, true);
     }
 
     protected void onCreate(Bundle savedInstanceState, boolean isFull) {
 	super.onCreate(savedInstanceState);
-	requestWindowFeature(Window.FEATURE_NO_TITLE);
 	if (isFull) {
+	    super.onCreate(savedInstanceState);
+	    requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 		    WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	}
-	// initScreen(this);
+	setScreenDirection();
 	ViewUtil.inject(this);
 	GlobalUtil.setCurrentView(this);
 	init();
@@ -69,7 +60,26 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 	} else {
 	    setLandScape();
 	}
+    }
 
+    public void setScreenDirection() {
+	if (GlobalUtil.getDirection() == null
+		|| GlobalUtil.getDirection().isEmpty()
+		|| GlobalUtil.getDirection() == "") {
+	    ApplicationInfo appInfo = null;
+	    try {
+		appInfo = this.getPackageManager().getApplicationInfo(
+			getPackageName(), PackageManager.GET_META_DATA);
+	    } catch (NameNotFoundException e) {
+		e.printStackTrace();
+	    }
+	    GlobalUtil.setDirection(appInfo.metaData.getString("direction"));
+	}
+	if (GlobalUtil.getDirection().equals(Constant.PORTRAIT)) {
+	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	} else if (GlobalUtil.getDirection().equals(Constant.LANDSCAPE)) {
+	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	}
     }
 
     @Override
@@ -169,6 +179,20 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 		.beginTransaction();
 	fragmentTransaction.replace(id, fragment);
 	fragmentTransaction.commit();
+    }
+
+    /**
+     * 顯示提示語句
+     * 
+     * @param messageStr
+     */
+    public void showToast(CharSequence messageStr) {
+	if (null == toast) {
+	    toast = Toast.makeText(this, messageStr, Toast.LENGTH_SHORT);
+	} else {
+	    toast.setText(messageStr);
+	}
+	toast.show();
     }
 
 }
