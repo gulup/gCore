@@ -112,7 +112,7 @@ public class ViewUtil {
 	    InputStream open = finder.getContext().getAssets()
 		    .open(contentViewName + ".json");
 	    parseObject = JSON.parseObject(IOUtils.toString(open));
-	    if(parseObject!=null){
+	    if (parseObject != null) {
 		jsonObject = parseObject.getJSONObject(viewName);
 	    }
 	} catch (IOException e) {
@@ -125,9 +125,23 @@ public class ViewUtil {
 	} catch (ClassNotFoundException e2) {
 	    e2.printStackTrace();
 	}
-
+	
+	
 	if (fields != null && fields.length > 0) {
+
 	    for (Field field : fields) {
+		if (!contentView.useAnnotation()) {
+		    if (View.class.isAssignableFrom(field.getType())) {
+			View view = finder.findViewById(field.getName(), "id");
+			viewName = field.getName();
+			try {
+			    initView(view, field, handler, parseObject, viewName, suClass);
+			} catch (Exception e) {
+			    e.printStackTrace();
+			}
+			continue;
+		    }
+		}
 		GView viewInject = field.getAnnotation(GView.class);
 		if (viewInject != null) {
 		    try {
@@ -142,104 +156,8 @@ public class ViewUtil {
 				    viewInject.type());
 			    viewName = viewInject.name();
 			}
-			if (view != null) {
-			    field.setAccessible(true);
-			    field.set(handler, view);
-			    jsonObject = parseObject.getJSONObject(viewName);
-			    if (jsonObject != null) {
-				int w = 0;
-				int h = 0;
-				int top = 0;
-				int bottom = 0;
-				int left = 0;
-				int right = 0;
-				if (GlobalUtil.getDirection() != null) {
-				    if (GlobalUtil.getDirection().equals(Constant.PORTRAIT)) {
-					w = jsonObject.getIntValue("pw");
-					h = jsonObject.getIntValue("ph");
-					top = jsonObject.getIntValue("pt");
-					bottom = jsonObject.getIntValue("pb");
-					left = jsonObject.getIntValue("pl");
-					right = jsonObject.getIntValue("pr");
-				    } else if (GlobalUtil.getDirection()
-					    .equals(Constant.LANDSCAPE)) {
-					w = jsonObject.getIntValue("lw");
-					h = jsonObject.getIntValue("lh");
-					top = jsonObject.getIntValue("lt");
-					bottom = jsonObject.getIntValue("lb");
-					left = jsonObject.getIntValue("ll");
-					right = jsonObject.getIntValue("lr");
-				    }
-				    if (w != 0 && h != 0) {
-					Method setViewSize = suClass.getMethod(
-						"setViewSize", View.class,
-						float.class, float.class);
-					setViewSize.invoke(suClass, view, w, h);
-				    } else if (w != 0) {
-					Method setViewWidth = suClass
-						.getMethod("setViewWidth",
-							View.class, float.class);
-					setViewWidth.invoke(suClass, view, w);
-				    } else if (h != 0) {
-					Method setViewHeight = suClass
-						.getMethod("setViewHeight",
-							View.class, float.class);
-					setViewHeight.invoke(suClass, view, h);
-				    }
-				}
-				Method setViewMargin = suClass.getMethod(
-					"setViewMargin", View.class,
-					float.class, float.class, float.class,
-					float.class);
-				if (top != 0 || bottom != 0 || left != 0
-					|| right != 0) {
-				    setViewMargin.invoke(suClass, view, top,
-					    bottom, left, right);
-				}
-
-				/*
-				 * setListener(handler, field,
-				 * viewInject.onClick(), inMethod.Click);
-				 * setListener(handler, field,
-				 * viewInject.longClick(), inMethod.LongClick);
-				 * setListener(handler, field,
-				 * viewInject.itemClick(), inMethod.ItemClick);
-				 * setListener(handler, field,
-				 * viewInject.itemLongClick(),
-				 * inMethod.itemLongClick);
-				 */
-				/*
-				 * if (viewInject.width() != 0) { if
-				 * (viewInject.height() != 0) { Method
-				 * setViewSize = suClass.getMethod(
-				 * "setViewSize", View.class, float.class,
-				 * float.class); setViewSize.invoke(suClass,
-				 * view, viewInject.width(),
-				 * viewInject.height()); } else { Method
-				 * setViewWidth = suClass.getMethod(
-				 * "setViewWidth", View.class, float.class);
-				 * setViewWidth.invoke(suClass, view,
-				 * viewInject.width()); } } else if
-				 * (viewInject.height() != 0) { Method
-				 * setViewHeight = suClass.getMethod(
-				 * "setViewHeight", View.class, float.class);
-				 * setViewHeight.invoke(suClass, view,
-				 * viewInject.height()); }
-				 */
-				/*
-				 * Method setViewMargin = suClass.getMethod(
-				 * "setViewMargin", View.class, float.class,
-				 * float.class, float.class, float.class);
-				 * setViewMargin.invoke(suClass, view,
-				 * viewInject.top(), viewInject.bottom(),
-				 * viewInject.left(), viewInject.right()); if
-				 * (viewInject.center() != 0) { Method setCenter
-				 * = suClass.getMethod( "setCenter", View.class,
-				 * int.class); setCenter.invoke(suClass, view,
-				 * viewInject.center()); }
-				 */
-			    }
-			}
+			initView(view, field, handler, parseObject,
+				viewName, suClass);
 		    } catch (Throwable e) {
 			LogUtil.e(e.getMessage(), e);
 		    }
@@ -269,7 +187,7 @@ public class ViewUtil {
 				.getAnnotation(GFragment.class);
 			if (fragmentInject != null) {
 			    try {
-				Class clazz = field.getType();
+				Class<?> clazz = field.getType();
 				Fragment fragment = (Fragment) clazz
 					.newInstance();
 				field.setAccessible(true);
@@ -546,5 +464,75 @@ public class ViewUtil {
 
     public enum inMethod {
 	Click, LongClick, ItemClick, itemLongClick
+    }
+
+    private static void initView(View view, Field field, Object handler,
+	    JSONObject parseObject, String viewName, Class<?> suClass)
+	    throws Exception {
+	if (view != null) {
+	    field.setAccessible(true);
+	    field.set(handler, view);
+	    JSONObject jsonObject = null;
+	    if (parseObject != null) {
+		jsonObject = parseObject.getJSONObject(viewName);
+	    } else {
+		return;
+	    }
+	    if (jsonObject != null) {
+		int w = 0;
+		int h = 0;
+		int top = 0;
+		int bottom = 0;
+		int left = 0;
+		int right = 0;
+		if (GlobalUtil.getDirection() != null) {
+		    if (GlobalUtil.getDirection().equals(Constant.PORTRAIT)) {
+			w = jsonObject.getIntValue("pw");
+			h = jsonObject.getIntValue("ph");
+			top = jsonObject.getIntValue("pt");
+			bottom = jsonObject.getIntValue("pb");
+			left = jsonObject.getIntValue("pl");
+			right = jsonObject.getIntValue("pr");
+		    } else if (GlobalUtil.getDirection().equals(
+			    Constant.LANDSCAPE)) {
+			w = jsonObject.getIntValue("lw");
+			h = jsonObject.getIntValue("lh");
+			top = jsonObject.getIntValue("lt");
+			bottom = jsonObject.getIntValue("lb");
+			left = jsonObject.getIntValue("ll");
+			right = jsonObject.getIntValue("lr");
+		    }
+		    if (w != 0 && h != 0) {
+			Method setViewSize = suClass.getMethod("setViewSize",
+				View.class, float.class, float.class);
+			setViewSize.invoke(suClass, view, w, h);
+		    } else if (w != 0) {
+			Method setViewWidth = suClass.getMethod("setViewWidth",
+				View.class, float.class);
+			setViewWidth.invoke(suClass, view, w);
+		    } else if (h != 0) {
+			Method setViewHeight = suClass.getMethod(
+				"setViewHeight", View.class, float.class);
+			setViewHeight.invoke(suClass, view, h);
+		    }
+		}
+		Method setViewMargin = suClass.getMethod("setViewMargin",
+			View.class, float.class, float.class, float.class,
+			float.class);
+		if (top != 0 || bottom != 0 || left != 0 || right != 0) {
+		    setViewMargin.invoke(suClass, view, top, bottom, left,
+			    right);
+		}
+
+		/*
+		 * setListener(handler, field, viewInject.onClick(),
+		 * inMethod.Click); setListener(handler, field,
+		 * viewInject.longClick(), inMethod.LongClick);
+		 * setListener(handler, field, viewInject.itemClick(),
+		 * inMethod.ItemClick); setListener(handler, field,
+		 * viewInject.itemLongClick(), inMethod.itemLongClick);
+		 */
+	    }
+	}
     }
 }

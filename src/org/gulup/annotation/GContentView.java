@@ -19,4 +19,5 @@ public @interface GContentView {
 	int viewType() default 0;
 	String name() default "";
 	String type() default "layout";
+	boolean useAnnotation() default true;
 }

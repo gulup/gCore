@@ -39,14 +39,12 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
     private Toast toast;
 
     protected void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState);
 	this.onCreate(savedInstanceState, true);
     }
 
     protected void onCreate(Bundle savedInstanceState, boolean isFull) {
 	super.onCreate(savedInstanceState);
 	if (isFull) {
-	    super.onCreate(savedInstanceState);
 	    requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 		    WindowManager.LayoutParams.FLAG_FULLSCREEN);
