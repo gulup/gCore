@@ -125,23 +125,10 @@ public class ViewUtil {
 	} catch (ClassNotFoundException e2) {
 	    e2.printStackTrace();
 	}
-	
-	
+
 	if (fields != null && fields.length > 0) {
 
 	    for (Field field : fields) {
-		if (!contentView.useAnnotation()) {
-		    if (View.class.isAssignableFrom(field.getType())) {
-			View view = finder.findViewById(field.getName(), "id");
-			viewName = field.getName();
-			try {
-			    initView(view, field, handler, parseObject, viewName, suClass);
-			} catch (Exception e) {
-			    e.printStackTrace();
-			}
-			continue;
-		    }
-		}
 		GView viewInject = field.getAnnotation(GView.class);
 		if (viewInject != null) {
 		    try {
@@ -156,78 +143,91 @@ public class ViewUtil {
 				    viewInject.type());
 			    viewName = viewInject.name();
 			}
-			initView(view, field, handler, parseObject,
-				viewName, suClass);
+			initView(view, field, handler, parseObject, viewName,
+				suClass);
 		    } catch (Throwable e) {
 			LogUtil.e(e.getMessage(), e);
 		    }
 		} else {
-		    GAction actionInject = field.getAnnotation(GAction.class);
-		    if (actionInject != null) {
+		    if (View.class.isAssignableFrom(field.getType())) {
+			View view = finder.findViewById(field.getName(), "id");
+			viewName = field.getName();
 			try {
-			    Class clazz = field.getType();
-			    Constructor<? extends GBaseAction> c = clazz
-				    .getConstructor(Context.class);
-			    GBaseAction action = null;
-			    if (finder.getContext() != null) {
-				action = c.newInstance(finder.getContext());
-			    } else {
-				action = c.newInstance(handler);
-			    }
-			    field.setAccessible(true);
-			    field.set(handler, action);
-			    Method setAction = handlerType.getMethod(
-				    "setAction", GBaseAction.class);
-			    setAction.invoke(handler, action);
-			} catch (Throwable e) {
-			    LogUtil.e(e.getMessage(), e);
+			    initView(view, field, handler, parseObject,
+				    viewName, suClass);
+			} catch (Exception e) {
+			    e.printStackTrace();
 			}
 		    } else {
-			GFragment fragmentInject = field
-				.getAnnotation(GFragment.class);
-			if (fragmentInject != null) {
+			GAction actionInject = field
+				.getAnnotation(GAction.class);
+			if (actionInject != null) {
 			    try {
-				Class<?> clazz = field.getType();
-				Fragment fragment = (Fragment) clazz
-					.newInstance();
+				Class clazz = field.getType();
+				Constructor<? extends GBaseAction> c = clazz
+					.getConstructor(Context.class);
+				GBaseAction action = null;
+				if (finder.getContext() != null) {
+				    action = c.newInstance(finder.getContext());
+				} else {
+				    action = c.newInstance(handler);
+				}
 				field.setAccessible(true);
-				field.set(handler, fragment);
-			    } catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			    } catch (InstantiationException e) {
-				e.printStackTrace();
-			    } catch (IllegalAccessException e) {
-				e.printStackTrace();
+				field.set(handler, action);
+				Method setAction = handlerType.getMethod(
+					"setAction", GBaseAction.class);
+				setAction.invoke(handler, action);
+			    } catch (Throwable e) {
+				LogUtil.e(e.getMessage(), e);
 			    }
 			} else {
-			    GRes resInject = field.getAnnotation(GRes.class);
-			    if (resInject != null) {
+			    GFragment fragmentInject = field
+				    .getAnnotation(GFragment.class);
+			    if (fragmentInject != null) {
 				try {
-				    Object res = ResLoader
-					    .loadRes(resInject.type(),
-						    finder.getContext(),
-						    resInject.id());
-				    if (res != null) {
-					field.setAccessible(true);
-					field.set(handler, res);
-				    }
-				} catch (Throwable e) {
-				    LogUtil.e(e.getMessage(), e);
+				    Class<?> clazz = field.getType();
+				    Fragment fragment = (Fragment) clazz
+					    .newInstance();
+				    field.setAccessible(true);
+				    field.set(handler, fragment);
+				} catch (IllegalArgumentException e) {
+				    e.printStackTrace();
+				} catch (InstantiationException e) {
+				    e.printStackTrace();
+				} catch (IllegalAccessException e) {
+				    e.printStackTrace();
 				}
 			    } else {
-				GPreference preferenceInject = field
-					.getAnnotation(GPreference.class);
-				if (preferenceInject != null) {
+				GRes resInject = field
+					.getAnnotation(GRes.class);
+				if (resInject != null) {
 				    try {
-					Preference preference = finder
-						.findPreference(preferenceInject
-							.value());
-					if (preference != null) {
+					Object res = ResLoader.loadRes(
+						resInject.type(),
+						finder.getContext(),
+						resInject.id());
+					if (res != null) {
 					    field.setAccessible(true);
-					    field.set(handler, preference);
+					    field.set(handler, res);
 					}
 				    } catch (Throwable e) {
 					LogUtil.e(e.getMessage(), e);
+				    }
+				} else {
+				    GPreference preferenceInject = field
+					    .getAnnotation(GPreference.class);
+				    if (preferenceInject != null) {
+					try {
+					    Preference preference = finder
+						    .findPreference(preferenceInject
+							    .value());
+					    if (preference != null) {
+						field.setAccessible(true);
+						field.set(handler, preference);
+					    }
+					} catch (Throwable e) {
+					    LogUtil.e(e.getMessage(), e);
+					}
 				    }
 				}
 			    }
