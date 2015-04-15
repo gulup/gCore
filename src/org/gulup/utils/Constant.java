@@ -13,4 +13,5 @@ public class Constant {
     public static int FRAGMENT = 1;
     public static String PORTRAIT = "p";
     public static String LANDSCAPE = "l";
+    public static String UNSPECIFIED = "u";
 }

@@ -127,11 +127,11 @@ public class ScreenUtil {
      * 
      * @param view
      * @param top
-     * @param bootom
+     * @param bottom
      * @param left
      * @param right
      */
-    public static void setViewMargin(View view, float top, float bootom,
+    public static void setViewMargin(View view, float top, float bottom,
 	    float left, float right) {
 	if (view.getLayoutParams() instanceof LinearLayout.LayoutParams) {
 	    Field fWeight = null;
@@ -146,22 +146,27 @@ public class ScreenUtil {
 	    } catch (IllegalAccessException e) {
 		e.printStackTrace();
 	    }
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-		    view.getLayoutParams());
-	    params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
-	    params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
-	    params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
-	    params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+	    LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) view.getLayoutParams();
+	    if(top>0)
+		params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
+	    if(bottom>0)
+	    	params.bottomMargin = (int) ((bottom / Constant.DEF_HEIGHT) * screenHeight);
+	    if(left>0)
+	    	params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
+	    if(right>0)	
+	    	params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
 	    params.weight = f;
 	    view.setLayoutParams(params);
 	} else {
-	    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-		    view.getLayoutParams());
-	    int[] rules = params.getRules();
-	    params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
-	    params.bottomMargin = (int) ((bootom / Constant.DEF_HEIGHT) * screenHeight);
-	    params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
-	    params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
+	    RelativeLayout.LayoutParams params = (android.widget.RelativeLayout.LayoutParams) view.getLayoutParams();
+	    if(top>0)
+		params.topMargin = (int) ((top / Constant.DEF_HEIGHT) * screenHeight);
+	    if(bottom>0)
+	    	params.bottomMargin = (int) ((bottom / Constant.DEF_HEIGHT) * screenHeight);
+	    if(left>0)
+	    	params.leftMargin = (int) ((left / Constant.DEF_WIDTH) * screenWidth);
+	    if(right>0)	
+	    	params.rightMargin = (int) ((right / Constant.DEF_WIDTH) * screenWidth);
 	    view.setLayoutParams(params);
 	}
     }

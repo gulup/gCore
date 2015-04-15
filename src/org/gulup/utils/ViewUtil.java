@@ -143,8 +143,8 @@ public class ViewUtil {
 				    viewInject.type());
 			    viewName = viewInject.name();
 			}
-			initView(view, field, handler, parseObject, viewName,
-				suClass);
+			initView(viewInject, view, field, handler, parseObject,
+				viewName, suClass);
 		    } catch (Throwable e) {
 			LogUtil.e(e.getMessage(), e);
 		    }
@@ -153,8 +153,8 @@ public class ViewUtil {
 			View view = finder.findViewById(field.getName(), "id");
 			viewName = field.getName();
 			try {
-			    initView(view, field, handler, parseObject,
-				    viewName, suClass);
+			    initView(viewInject, view, field, handler,
+				    parseObject, viewName, suClass);
 			} catch (Exception e) {
 			    e.printStackTrace();
 			}
@@ -466,9 +466,9 @@ public class ViewUtil {
 	Click, LongClick, ItemClick, itemLongClick
     }
 
-    private static void initView(View view, Field field, Object handler,
-	    JSONObject parseObject, String viewName, Class<?> suClass)
-	    throws Exception {
+    private static void initView(GView viewInject, View view, Field field,
+	    Object handler, JSONObject parseObject, String viewName,
+	    Class<?> suClass) throws Exception {
 	if (view != null) {
 	    field.setAccessible(true);
 	    field.set(handler, view);
@@ -476,6 +476,31 @@ public class ViewUtil {
 	    if (parseObject != null) {
 		jsonObject = parseObject.getJSONObject(viewName);
 	    } else {
+		if (viewInject.width() != 0) {
+		    if (viewInject.height() != 0) {
+			Method setViewSize = suClass.getMethod("setViewSize",
+				View.class, float.class, float.class);
+			setViewSize.invoke(suClass, view, viewInject.width(),
+				viewInject.height());
+		    } else {
+			Method setViewWidth = suClass.getMethod("setViewWidth",
+				View.class, float.class);
+			setViewWidth.invoke(suClass, view, viewInject.width());
+		    }
+		} else if (viewInject.height() != 0) {
+		    Method setViewHeight = suClass.getMethod("setViewHeight",
+			    View.class, float.class);
+		    setViewHeight.invoke(suClass, view, viewInject.height());
+		}
+		Method setViewMargin = suClass.getMethod("setViewMargin",
+			View.class, float.class, float.class, float.class,
+			float.class);
+		if (viewInject.top() != 0 || viewInject.bottom() != 0
+			|| viewInject.left() != 0 || viewInject.right() != 0) {
+		    setViewMargin.invoke(suClass, view, viewInject.top(),
+			    viewInject.bottom(), viewInject.left(),
+			    viewInject.right());
+		}
 		return;
 	    }
 	    if (jsonObject != null) {

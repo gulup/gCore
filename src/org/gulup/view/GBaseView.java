@@ -20,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,7 +30,7 @@ import android.widget.Toast;
  * @author gulup
  * @version 创建时间：2014-9-15 下午2:35:23 类说明
  */
-public abstract class GBaseView extends FragmentActivity implements Observer {
+public abstract class GBaseView extends ActionBarActivity implements Observer {
 
     /*
      * public ScreenUtil su; protected int screenHeight; protected int
@@ -43,12 +44,12 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
     }
 
     protected void onCreate(Bundle savedInstanceState, boolean isFull) {
-	super.onCreate(savedInstanceState);
 	if (isFull) {
 	    requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 		    WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	}
+	super.onCreate(savedInstanceState);
 	setScreenDirection();
 	ViewUtil.inject(this);
 	GlobalUtil.setCurrentView(this);
@@ -68,15 +69,26 @@ public abstract class GBaseView extends FragmentActivity implements Observer {
 	    try {
 		appInfo = this.getPackageManager().getApplicationInfo(
 			getPackageName(), PackageManager.GET_META_DATA);
+		if (appInfo.metaData == null) {
+		    GlobalUtil.setDirection("u");
+		}else{
+		    String direction = appInfo.metaData.getString("direction");
+		    if (direction == null || direction.isEmpty()
+			    || direction == "") {
+			direction = "u";
+		    }
+		    GlobalUtil.setDirection(direction);
+		}
 	    } catch (NameNotFoundException e) {
 		e.printStackTrace();
 	    }
-	    GlobalUtil.setDirection(appInfo.metaData.getString("direction"));
 	}
 	if (GlobalUtil.getDirection().equals(Constant.PORTRAIT)) {
 	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	} else if (GlobalUtil.getDirection().equals(Constant.LANDSCAPE)) {
 	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	} else if (GlobalUtil.getDirection().equals(Constant.UNSPECIFIED)) {
+	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 	}
     }
 
